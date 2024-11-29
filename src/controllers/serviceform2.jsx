@@ -11,6 +11,8 @@ export default function ServiceForm() {
   const { id } = useParams()
   const navigate = useNavigate()
 
+  const [address, setAddress] = useState('')
+
   // Declaración del estado con setMinTime correctamente
   const [formData, setFormData] = useState({
     date: '',
@@ -23,34 +25,18 @@ export default function ServiceForm() {
   })
 
   useEffect(() => {
-    // Declaración correcta de la variable `today`
     const today = new Date()
-
-    // Formatear la fecha
     const year = today.getFullYear()
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const day = String(today.getDate()).padStart(2, '0')
-    setMinDate(`${year}-${month}-${day}`)
+    const todayFormatted = `${year}-${month}-${day}`
 
-    // Establecer el valor de "today" en el estado
+    setMinDate(todayFormatted)
+
     setFormData((prevData) => ({
       ...prevData,
-      date: today,
-    }));
-
-    // También puedes definir una fecha máxima si es necesario
-    const maxDate = new Date();
-    maxDate.setFullYear(maxDate.getFullYear() + 1); // Por ejemplo, un año en el futuro
-    const maxYear = maxDate.getFullYear();
-    const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
-    const maxDay = String(maxDate.getDate()).padStart(2, '0');
-    setMaxDateStr(`${maxYear}-${maxMonth}-${maxDay}`);
-
-    // Obtener la hora mínima seleccionable (30 minutos después de la hora actual)
-    const minSelectableTime = new Date(today.getTime() + 30 * 60 * 1000)
-    const hours = String(minSelectableTime.getHours()).padStart(2, '0')
-    const minutes = String(minSelectableTime.getMinutes()).padStart(2, '0')
-    setMinTime(`${hours}:${minutes}`)
+      date: todayFormatted, // Asegúrate de que el valor de la fecha esté en este formato
+    }))
   }, [])
 
   const [error, setError] = useState('')
@@ -66,20 +52,31 @@ export default function ServiceForm() {
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    if (name === 'date') {
+      // Asegúrate de que la fecha ingresada esté en formato correcto
+      const dateParts = value.split('-')
+      if (dateParts.length === 3) {
+        const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: formattedDate,
+        }));
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleAddressSelect = (selectedAddress) => {
-    setAddress(selectedAddress)
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       address: selectedAddress
-    }))
-  }
-
+    }));
+  };
+  
   const handleSubmit = async (event) => {
     event.preventDefault()
 

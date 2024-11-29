@@ -35,7 +35,14 @@ export default function ServiceForm() {
     const year = today.getFullYear()
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const day = String(today.getDate()).padStart(2, '0')
-    setMinDate(`${year}-${month}-${day}`)
+    const todayFormatted = `${year}-${month}-${day}`
+    
+    setMinDate(todayFormatted)
+    
+    setFormData((prevData) => ({
+      ...prevData,
+      date: todayFormatted, // Asegúrate de que el valor de la fecha esté en este formato
+    }))    
 
     const minSelectableTime = new Date(today.getTime() + 30 * 60 * 1000)
     const hours = String(minSelectableTime.getHours()).padStart(2, '0')
@@ -44,12 +51,25 @@ export default function ServiceForm() {
   }, [])
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }))
-  }
+    const { name, value } = e.target;
+    if (name === 'date') {
+      // Asegúrate de que la fecha ingresada esté en formato correcto
+      const dateParts = value.split('-')
+      if (dateParts.length === 3) {
+        const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: formattedDate,
+        }));
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+  
 
   const handleAddressSelect = (selectedAddress) => {
     setAddress(selectedAddress)

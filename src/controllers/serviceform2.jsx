@@ -11,6 +11,7 @@ export default function ServiceForm() {
   const { id } = useParams()
   const navigate = useNavigate()
 
+  // Declaración del estado con setMinTime correctamente
   const [formData, setFormData] = useState({
     date: '',
     time: '',
@@ -21,45 +22,66 @@ export default function ServiceForm() {
     detalles: '',
   })
 
-  const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
-  const [step, setStep] = useState(1)
-  const [orderNumber, setOrderNumber] = useState(null)
-  const [minDate, setMinDate] = useState('')
-  const [minTime, setMinTime] = useState('')
-
   useEffect(() => {
+    // Declaración correcta de la variable `today`
     const today = new Date()
+
+    // Formatear la fecha
     const year = today.getFullYear()
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const day = String(today.getDate()).padStart(2, '0')
     setMinDate(`${year}-${month}-${day}`)
 
+    // Establecer el valor de "today" en el estado
+    setFormData((prevData) => ({
+      ...prevData,
+      date: today,
+    }));
+
+    // También puedes definir una fecha máxima si es necesario
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 1); // Por ejemplo, un año en el futuro
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
+    const maxDay = String(maxDate.getDate()).padStart(2, '0');
+    setMaxDateStr(`${maxYear}-${maxMonth}-${maxDay}`);
+
+    // Obtener la hora mínima seleccionable (30 minutos después de la hora actual)
     const minSelectableTime = new Date(today.getTime() + 30 * 60 * 1000)
     const hours = String(minSelectableTime.getHours()).padStart(2, '0')
     const minutes = String(minSelectableTime.getMinutes()).padStart(2, '0')
     setMinTime(`${hours}:${minutes}`)
   }, [])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }))
-  }
+  const [error, setError] = useState('')
+  const [mensaje, setMensaje] = useState('')
+  const [step, setStep] = useState(1)
+  const [orderNumber, setOrderNumber] = useState(null)
+  const [minDate, setMinDate] = useState('')
+  const [maxDateStr, setMaxDateStr] = useState(''); // Declara el estado para maxDateStr
+  const [minTime, setMinTime] = useState('')
+  const [maxTime, setMaxTime] = useState(''); // Asegúrate de tener este estado declarado
 
-  const handleAddressSelect = (address) => {
-    console.log('ServiceForm: Address selected:', address)
+
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleAddressSelect = (selectedAddress) => {
+    setAddress(selectedAddress)
     setFormData(prevState => ({
       ...prevState,
-      address: address
+      address: selectedAddress
     }))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    console.log('ServiceForm: Form submitted')
 
     if (!formData.date || !formData.time || !formData.address || !formData.marcaAC || !formData.tipoAC || (formData.marcaAC === 'otra' && !formData.otraMarca)) {
       setError('Todos los campos son obligatorios.')
@@ -84,20 +106,16 @@ export default function ServiceForm() {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL
-      console.log('ServiceForm: Sending request to:', `${apiUrl}/formulario/crear-solicitud`)
       const response = await axios.post(`${apiUrl}/formulario/crear-solicitud`, solicitudData, {
         headers: { Authorization: token },
       })
-      console.log('ServiceForm: Response received:', response.data)
       setOrderNumber(response.data.orderNumber)
       setMensaje(response.data.mensaje)
       setError('')
       setStep(3)
 
-      // Navegar a PedidoCompletado después de éxito
       navigate(`/pedidocompletado/${response.data.orderNumber}`)
     } catch (err) {
-      console.error('ServiceForm: Error submitting form:', err)
       setError(err.response?.data?.error || 'Error al enviar la solicitud.')
       setMensaje('')
     }
@@ -118,38 +136,39 @@ export default function ServiceForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-16 lg:py-32 mb-16">
+      <main className="flex-grow container mx-auto px-4 py-8 lg:py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto"
+          className="max-w-4xl mx-auto"
         >
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             <div className="px-6 py-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
                 <Wind className="w-8 h-8" />
-                Area de Refrigeracion
+                Área de Refrigeración
               </h2>
               <p className="mt-2 text-blue-100">Complete el formulario para solicitar nuestro servicio</p>
             </div>
 
             <div className="p-6 lg:p-8">
               {/* Progress bar */}
-              <div className="mb-10">
-                <div className="relative w-full bg-blue-100 rounded-full h-3">
+              <div className="mb-8">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="font-medium text-gray-600">Paso {step} de 2</span>
+                  <span className="font-medium text-blue-600">{Math.round(progressPercentage)}% Completado</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <motion.div
-                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${progressPercentage}%` }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercentage}%` }}
                     transition={{ duration: 0.5 }}
                   />
-                </div>
-                <div className="flex justify-between mt-3">
-                  <span className="text-sm font-medium text-blue-700">Paso {step} de 2</span>
-                  <span className="text-sm font-medium text-blue-700">{Math.round(progressPercentage)}% Completado</span>
                 </div>
               </div>
 
@@ -179,166 +198,186 @@ export default function ServiceForm() {
                 )}
               </AnimatePresence>
 
-              <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={step}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-6"
-                    >
-                      {step === 1 && (
-                        <>
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="date">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-4 h-4 text-blue-600" />
-                                ¿Cuándo lo necesitas?
-                              </div>
-                              <input
-                                type="date"
-                                id="date"
-                                name="date"
-                                className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                value={formData.date}
-                                onChange={handleChange}
-                                min={minDate}
-                                required
-                              />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {step === 1 && (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700" htmlFor="date">
+                              <Calendar className="w-4 h-4 text-blue-600 inline mr-2" />
+                              ¿Cuándo lo necesitas?
                             </label>
+                            <input
+                              type="date"
+                              id="date"
+                              name="date"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              value={formData.date}
+                              onChange={handleChange}
+                              min={formData.date}  // Esto asegura que el mínimo sea la fecha de hoy
+                              max={maxDateStr}     // Este es el valor máximo (un año en el futuro en este caso)
+                              required
+                            />
                           </div>
 
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="time">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Clock className="w-4 h-4 text-blue-600" />
-                                ¿A qué hora?
-                              </div>
-                              <input
-                                type="time"
-                                id="time"
-                                name="time"
-                                className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                value={formData.time}
-                                onChange={handleChange}
-                                min={minTime}
-                                required
-                              />
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700" htmlFor="time">
+                              <Clock className="w-4 h-4 text-blue-600 inline mr-2" />
+                              ¿A qué hora lo prefieres?
                             </label>
+                            <input
+                              type="time"
+                              id="time"
+                              name="time"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              value={formData.time}
+                              onChange={handleChange}
+                              min={minTime}
+                              max={maxTime}
+                              required
+                            />
                           </div>
+                        </div>
 
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="address">
-                              <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="w-4 h-4 text-blue-600" />
-                                ¿Dónde es el servicio?
-                              </div>
-                              <GoogleMapsComponent
-                                address={formData.address}
-                                onAddressSelect={handleAddressSelect}
-                              />
-                            </label>
-                          </div>
-                        </>
-                      )}
-
-                      {step === 2 && (
-                        <>
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="marcaAC">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Wind className="w-4 h-4 text-blue-600" />
-                                Marca de aire acondicionado
-                              </div>
-                              <input
-                                type="text"
-                                id="marcaAC"
-                                name="marcaAC"
-                                value={formData.marcaAC}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                required
-                              />
-                            </label>
-                          </div>
-
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="tipoAC">
-                              <div className="flex items-center gap-2 mb-2">
-                                <ChevronRight className="w-4 h-4 text-blue-600" />
-                                Tipo de aire acondicionado
-                              </div>
-                              <input
-                                type="text"
-                                id="tipoAC"
-                                name="tipoAC"
-                                value={formData.tipoAC}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                required
-                              />
-                            </label>
-                          </div>
-
-                          <div className="space-y-4">
-                            <label className="block text-gray-700 text-sm font-semibold" htmlFor="detalles">
-                              <div className="flex items-center gap-2 mb-2">
-                                <ChevronLeft className="w-4 h-4 text-blue-600" />
-                                Detalles adicionales
-                              </div>
-                              <textarea
-                                id="detalles"
-                                name="detalles"
-                                value={formData.detalles}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                                rows="4"
-                                placeholder="Escriba cualquier detalle adicional"
-                              ></textarea>
-                            </label>
-                          </div>
-                        </>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-
-                  <div className="flex justify-between mt-8">
-                    {step > 1 && (
-                      <button
-                        type="button"
-                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg shadow-sm hover:bg-gray-300"
-                        onClick={handlePreviousStep}
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        Atrás
-                      </button>
-                    )}
-
-                    {step < 2 && (
-                      <button
-                        type="button"
-                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700"
-                        onClick={handleNextStep}
-                      >
-                        Siguiente
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700" htmlFor="address">
+                            <MapPin className="w-4 h-4 text-blue-600 inline mr-2" />
+                            Dirección
+                          </label>
+                          <GoogleMapsComponent
+                            apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                            address={formData.address}
+                            onAddressSelect={handleAddressSelect}
+                          />
+                        </div>
+                      </>
                     )}
 
                     {step === 2 && (
-                      <button
-                        type="submit"
-                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700"
-                      >
-                        Enviar
-                      </button>
+                      <>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700" htmlFor="marcaAC">
+                            <ChevronRight className="w-4 h-4 text-blue-600 inline mr-2" />
+                            ¿Cuál es la marca del refrigerador?
+                          </label>
+                          <select
+                            id="marcaAC"
+                            name="marcaAC"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            value={formData.marcaAC}
+                            onChange={handleChange}
+                            required
+                          >
+                                <option value="">Selecciona una opción</option>
+                                <option value="Samsung">Samsung</option>
+                                <option value="Mabe">Mabe</option>
+                                <option value="LG">LG</option>
+                                <option value="Hisense">Mirrabe</option>
+                                <option value="Midea">Samsung</option>
+                                <option value="otra">Otra</option>
+                          </select>
+                        </div>
+
+                        {formData.marcaAC === 'otra' && (
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700" htmlFor="otraMarca">
+                              <ChevronRight className="w-4 h-4 text-blue-600 inline mr-2" />
+                              Otra Marca
+                            </label>
+                            <input
+                              type="text"
+                              id="otraMarca"
+                              name="otraMarca"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              value={formData.otraMarca}
+                              onChange={handleChange}
+                              placeholder="Ingresa la marca"
+                              required={formData.marcaAC === 'otra'}
+                            />
+                          </div>
+                        )}
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700" htmlFor="tipoAC">
+                            <ChevronRight className="w-4 h-4 text-blue-600 inline mr-2" />
+                            Selecciona el tipo de Refrigerador
+                          </label>
+                          <select
+                            id="tipoAC"
+                            name="tipoAC"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            value={formData.tipoAC}
+                            onChange={handleChange}
+                            required
+                          >
+                                <option value="">Selecciona una opción</option>
+                                <option value="Grande">Grande</option>
+                                <option value="Mediano">Mediano</option>
+                                <option value="Pequeno">Pequeño</option>
+                                <option value="Mini">mini</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700" htmlFor="detalles">
+                            <ChevronRight className="w-4 h-4 text-blue-600 inline mr-2" />
+                            ¿Necesitas agregar algún detalle?
+                          </label>
+                          <textarea
+                            id="detalles"
+                            name="detalles"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            rows="4"
+                            value={formData.detalles}
+                            onChange={handleChange}
+                            placeholder="Detalles adicionales (opcional)"
+                          />
+                        </div>
+                      </>
                     )}
-                  </div>
-                </form>
-              </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                <div className="flex justify-between items-center pt-4">
+                  {step > 1 && (
+                    <button
+                      type="button"
+                      onClick={handlePreviousStep}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-2" />
+                      Anterior
+                    </button>
+                  )}
+                  {step < 2 ? (
+                    <button
+                      type="button"
+                      onClick={handleNextStep}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Siguiente
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Enviar
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </button>
+                  )}
+                </div>
+              </form>
             </div>
           </div>
         </motion.div>
@@ -347,3 +386,28 @@ export default function ServiceForm() {
     </div>
   )
 }
+
+function PedidoCompletado({ orderNumber }) {
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white py-12">
+      <div className="bg-white rounded-xl shadow-xl p-8 max-w-md mx-auto">
+        <div className="text-center">
+          <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
+          <h3 className="text-2xl font-bold mt-6 text-gray-800">¡Pedido Completado!</h3>
+          <p className="text-gray-600 mt-4">Gracias por confiar en nosotros. Tu número de pedido es:</p>
+          <div className="text-2xl font-semibold mt-2 text-blue-600">{orderNumber}</div>
+          <div className="mt-8">
+            <Link
+              to="/"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Volver al inicio
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+

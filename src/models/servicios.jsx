@@ -46,11 +46,13 @@ export default function Component() {
     }
   }
 
+  // Cambia esta parte en la función handleCancelRequest
   const handleCancelRequest = async (solicitudId) => {
-    setSelectedRequestId(solicitudId)
-    setShowConfirmDialog(true)
+    setSelectedRequestId(solicitudId)  // Aquí guardamos el ID seleccionado
+    setShowConfirmDialog(true)  // Mostramos el diálogo de confirmación
   }
 
+  // Modifica esta parte de confirmCancelRequest
   const confirmCancelRequest = async () => {
     try {
       const token = localStorage.getItem('session_token')
@@ -58,9 +60,10 @@ export default function Component() {
         setError('No se encontró el token de sesión.')
         return
       }
-      
+
       const apiUrl = import.meta.env.VITE_API_URL; // Obtener la URL de la variable de entorno
-      await axios.delete(`${apiUrl}/formulario/cancelar-solicitud/${solicitudId}`, {
+      // Usamos el estado selectedRequestId aquí, no solicitudId directamente
+      await axios.delete(`${apiUrl}/formulario/cancelar-solicitud/${selectedRequestId}`, {
         headers: { Authorization: token }
       })
       fetchPendingRequests()
@@ -69,7 +72,7 @@ export default function Component() {
       console.error('Error cancelling request:', err)
     } finally {
       setShowConfirmDialog(false)
-      setSelectedRequestId(null)
+      setSelectedRequestId(null)  // Limpiamos el ID seleccionado después de la cancelación
     }
   }
 

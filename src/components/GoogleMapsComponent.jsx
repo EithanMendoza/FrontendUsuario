@@ -2,17 +2,21 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Loader } from '@googlemaps/js-api-loader'
 import { AlertCircle } from 'lucide-react'
 
-export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
+const GoogleMapsComponent = ({ apiKey, address, onAddressSelect }) => {
   const mapRef = useRef(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [error, setError] = useState(null)
   const [map, setMap] = useState(null)
+  const [marker, setMarker] = useState(null)
 
   useEffect(() => {
-    console.log('GoogleMapsComponent: Starting to load Google Maps API')
     if (!apiKey) {
-      console.error('GoogleMapsComponent: API key is missing')
       setError('API key is required')
+      return
+    }
+
+    if (window.google && window.google.maps) {
+      setIsLoaded(true)
       return
     }
 
@@ -26,12 +30,10 @@ export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
 
     loader.load()
       .then(() => {
-        console.log('GoogleMapsComponent: Google Maps API loaded successfully')
         setIsLoaded(true)
         setError(null)
       })
       .catch((err) => {
-        console.error('GoogleMapsComponent: Error loading Google Maps API:', err)
         setError('Error al cargar Google Maps. Por favor, intente de nuevo más tarde.')
       })
   }, [apiKey])
@@ -39,9 +41,8 @@ export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
   useEffect(() => {
     if (!isLoaded || !mapRef.current || map) return
 
-    console.log('GoogleMapsComponent: Initializing map')
     try {
-      const initialCenter = { lat: 21.0158, lng: -89.1309 } // Mérida
+      const initialCenter = { lat: 21.0158, lng: -89.1309 }
       const newMap = new window.google.maps.Map(mapRef.current, {
         center: initialCenter,
         zoom: 12,
@@ -54,17 +55,14 @@ export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
       })
 
       const bounds = new window.google.maps.LatLngBounds(
-        new window.google.maps.LatLng(20.9158, -89.2309),
-        new window.google.maps.LatLng(21.1158, -89.0309)
+        new window.google.maps.LatLng(20.91733473855359, -89.67287067621708),
+        new window.google.maps.LatLng(21.01733473855359, -89.57287067621708)
       )
 
       newMap.fitBounds(bounds)
-      console.log('GoogleMapsComponent: Map initialized and bounds set')
 
-      // Initialize autocomplete after map is created
       const input = document.getElementById('address-input')
       if (input) {
-        console.log('GoogleMapsComponent: Setting up autocomplete')
         const autocomplete = new window.google.maps.places.Autocomplete(input, {
           bounds,
           strictBounds: true,
@@ -73,39 +71,34 @@ export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
 
         autocomplete.addListener('place_changed', () => {
           const place = autocomplete.getPlace()
-          console.log('GoogleMapsComponent: Place selected:', place)
           if (place.geometry) {
             newMap.setCenter(place.geometry.location)
             newMap.setZoom(15)
 
-            // Clear existing markers
-            if (window.currentMarker) {
-              window.currentMarker.setMap(null)
+            if (marker) {
+              marker.setMap(null)
             }
 
-            // Add new marker
-            window.currentMarker = new window.google.maps.Marker({
+            const newMarker = new window.google.maps.Marker({
               position: place.geometry.location,
               map: newMap,
               animation: window.google.maps.Animation.DROP
             })
 
+            setMarker(newMarker)
+
             if (onAddressSelect) {
-              console.log('GoogleMapsComponent: Calling onAddressSelect with:', place.formatted_address)
               onAddressSelect(place.formatted_address)
             }
           }
         })
-      } else {
-        console.warn('GoogleMapsComponent: address-input element not found')
       }
 
       setMap(newMap)
     } catch (err) {
-      console.error('GoogleMapsComponent: Map initialization error:', err)
       setError('Error al inicializar el mapa. Por favor, actualice la página.')
     }
-  }, [isLoaded, map, onAddressSelect])
+  }, [isLoaded, map, marker, onAddressSelect])
 
   if (error) {
     return (
@@ -119,17 +112,19 @@ export default function GoogleMapsComponent({ apiKey, onAddressSelect }) {
   }
 
   return (
-    <div className="relative rounded-lg overflow-hidden">
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <div className="text-sm text-gray-500">Cargando mapa...</div>
-        </div>
-      )}
-      <div 
-        ref={mapRef} 
-        className="w-full h-[400px]"
-        style={{ opacity: isLoaded ? 1 : 0 }}
-      />
+    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+      <div className="absolute top-4 left-4 right-4 z-10">
+        <input
+          id="address-input"
+          type="text"
+          placeholder="Ingresa una dirección"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div ref={mapRef} className="w-full h-full" />
     </div>
   )
 }
+
+export default GoogleMapsComponent
+

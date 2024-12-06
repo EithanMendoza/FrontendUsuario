@@ -17,6 +17,8 @@ import Gracias from './controllers/gracias';
 import TerminosYCondiciones from './components/terminos'; // Importa el componente de Términos y Condiciones
 import Garantia from './components/garantia'; // Asegúrate de que la ruta sea correcta
 import PedidoCompletado from './controllers/pedidocompletado';
+import BeneficiosPage from './components/BeneficiosPage';
+
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/BeneficiosPage" element={<BeneficiosPage />} />
         <Route
           path="/home"
           element={

@@ -92,7 +92,7 @@ const LandingPage = () => {
           </motion.div>
 
           <nav className="hidden lg:flex items-center space-x-10">
-            {['Inicio', 'Servicios', 'Sobre Nosotros', 'Preguntas Frecuentes'].map((item, index) => (
+            {['Inicio', 'Sobre Nosotros', 'Servicios', 'Preguntas Frecuentes'].map((item, index) => (
               <motion.a
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
@@ -186,14 +186,24 @@ const LandingPage = () => {
               <p className="text-lg text-gray-600 mb-8 max-w-2xl">
                 Encuentra profesionales capacitados para reparar y mantener tus equipos de aire acondicionado y refrigeración. ¡La mejor calidad y rapidez, a tu disposición!
               </p>
-              <motion.button
-                onClick={() => navigate('/login')} // Redirige a Login
-                className="px-8 py-4 bg-blue-600 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Comienza Ahora
-              </motion.button>
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                <motion.button
+                  onClick={() => navigate('/registerT')}
+                  className="px-8 py-4 bg-blue-600 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Comienza Ahora
+                </motion.button>
+                <motion.button
+                  onClick={() => navigate('/BeneficiosPage')}
+                  className="px-8 py-4 bg-white text-blue-600 font-semibold text-lg rounded-full shadow-lg hover:bg-blue-50 transition duration-300 border-2 border-blue-600"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Beneficios de contratar nuestro servicio
+                </motion.button>
+              </div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -343,28 +353,51 @@ const LandingPage = () => {
       </section>
 
 {/* CTA Section */}
-<section className="py-24 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-  <div className="container mx-auto px-4 text-center">
+<section className="py-24 bg-gradient-to-r from-blue-600 to-cyan-700 text-white">
+  <div className="container mx-auto px-4">
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="max-w-4xl mx-auto"
+      className="max-w-5xl mx-auto"
     >
-      <h2 className="text-3xl lg:text-5xl font-bold mb-6">¿Listo para mejorar tu confort?</h2>
-      <p className="text-xl mb-8 text-blue-100">Contrata nuestros servicios y disfruta de la mejor atención técnica</p>
-      <motion.button
-        onClick={() => navigate('/login')} // Redirige a la página de login
-        className="px-8 py-4 bg-white text-blue-600 font-semibold text-lg rounded-full shadow-lg hover:bg-blue-50 transition duration-300"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        Solicitar Servicio
-      </motion.button>
+      {/* Primera acción: Solicitar Servicio */}
+      <div className="text-center mb-16">
+        <h2 className="text-3xl lg:text-5xl font-bold mb-6">¿Listo para mejorar tu confort?</h2>
+        <p className="text-xl mb-8 text-blue-100">
+          Contrata nuestros servicios y disfruta de la mejor atención técnica.
+        </p>
+        <motion.button
+          onClick={() => navigate('/login')}
+          className="px-8 py-4 bg-white text-blue-600 font-semibold text-lg rounded-full shadow-lg hover:bg-blue-50 transition duration-300"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Solicitar Servicio
+        </motion.button>
+      </div>
+
+      {/* Separador visual */}
+      <div className="h-1 w-24 bg-white mx-auto mb-16"></div>
+
+      {/* Segunda acción: Unirse al equipo */}
+      <div className="text-center">
+        <h2 className="text-3xl lg:text-5xl font-bold mb-6">¿Te apasiona ayudar a otros?</h2>
+        <p className="text-xl mb-8 text-cyan-100">
+          Forma parte de nuestro equipo de expertos técnicos y accede a increíbles beneficios. Lleva tu carrera al siguiente nivel.
+        </p>
+        <motion.button
+          onClick={() => window.location.href = 'https://frontend-tecnico-nu.vercel.app/'}
+          className="px-8 py-4 bg-white text-cyan-600 font-semibold text-lg rounded-full shadow-lg hover:bg-cyan-50 transition duration-300"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          ¡Únete a Nuestro Equipo!
+        </motion.button>
+      </div>
     </motion.div>
   </div>
 </section>
-
 
 {/* Footer */}
 <footer className="bg-blue-900 text-white py-16">

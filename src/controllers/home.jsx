@@ -76,7 +76,7 @@ export default function MainPage() {
               onClick={() => navigate('/login')}
               className="mt-6 w-full bg-blue-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors duration-200"
             >
-              Iniciar Sesión
+              Iniciar QUE LA CHUPE AVILA
             </button>
           </motion.div>
         </div>

@@ -16,6 +16,7 @@ import Pago from './components/pago';
 import Gracias from './controllers/gracias';
 import TerminosYCondiciones from './components/terminos'; // Importa el componente de Términos y Condiciones
 import hometemporal from './components/hometemporal';
+import Registro from './components/Registro';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Registro />} />
         <Route path="/hometemporal" element={<hometemporal />} />
         <Route
           path="/home"

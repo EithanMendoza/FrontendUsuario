@@ -17,6 +17,7 @@ export default function MainPage() {
   useEffect(() => {
     const fetchProfileAndServices = async () => {
       const token = localStorage.getItem('session_token'); // Usar la misma clave que al almacenar el token
+      console.log('Token encontrado en localStorage:', token);
   
       if (!token) {
         console.log('Token no encontrado en localStorage');

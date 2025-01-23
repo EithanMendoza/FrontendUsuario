@@ -37,7 +37,9 @@ const AuthPage = () => {
           setMessage('Inicio de sesión exitoso');
           localStorage.setItem('sessionToken', data.session_token);
           setTimeout(() => {
-            navigate('/home');
+            console.log('Token recibido y almacenado:', data.session_token);
+console.log('Redirigiendo al home...');
+navigate('/home');
           }, 500);
         } else {
           setMessage(data.error || 'Error al iniciar sesión');

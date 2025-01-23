@@ -39,7 +39,7 @@ const Login = () => {
           setTimeout(() => {
             console.log('Token recibido y almacenado:', data.session_token);
 console.log('Redirigiendo al home...');
-navigate('/home');
+navigate('/hometemporal');
           }, 500);
         } else {
           setMessage(data.error || 'Error al iniciar sesión');

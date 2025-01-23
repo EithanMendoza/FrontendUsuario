@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/landipage';
-import Login from './components/login y registro';
+import Login from './components/Login';
 import Home from './controllers/home';
 import ProtectedRoute from './models/protectedRoute';
 import ServiceForm from './controllers/serviceform';

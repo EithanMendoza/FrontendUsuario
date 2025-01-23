@@ -27,9 +27,7 @@ const Registro = () => {
     try {
       const response = await fetch(`${apiUrl}/autenticacionUsuario/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre_usuario, email, password }),
       });
 
@@ -37,7 +35,7 @@ const Registro = () => {
 
       if (response.ok) {
         setMessage('Usuario registrado correctamente');
-        setTimeout(() => navigate('/login'), 500); // Redirige al login después de registrar
+        navigate('/login'); // Redirige al login después del registro
       } else {
         setMessage(data.error || 'Error al registrar el usuario');
       }

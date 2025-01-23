@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { FaLock, FaEnvelope } from 'react-icons/fa';
 import navbar from '../assets/navbar-logo.png';
 
@@ -8,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -18,9 +20,7 @@ const Login = () => {
     try {
       const response = await fetch(`${apiUrl}/autenticacionUsuario/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
@@ -28,9 +28,8 @@ const Login = () => {
 
       if (response.ok) {
         setMessage('Inicio de sesión exitoso');
-        localStorage.setItem('sessionToken', data.session_token);
-        console.log('Token recibido:', data.session_token);
-        setTimeout(() => navigate('/hometemporal'), 500); // Redirige al home temporal
+        login(data.session_token);
+        navigate('/home'); // Redirige al home después del login
       } else {
         setMessage(data.error || 'Error al iniciar sesión');
       }

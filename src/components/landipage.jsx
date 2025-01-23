@@ -192,7 +192,7 @@ const LandingPage = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Que la chupe Avila
+                Comienza Ahora
               </motion.button>
             </motion.div>
             <motion.div

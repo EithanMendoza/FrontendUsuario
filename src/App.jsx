@@ -1,17 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Registro from './pages/Register';
-import Home from './pages/Home';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Registro from './components/Registro';
+import Home from './components/Home';
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+const PrivateRoute = ({ children }) => {
+  const { token } = useAuth();
+
+  // Si hay un token, renderiza el componente; si no, redirige a "/login"
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Ruta base: redirige automáticamente al login */}
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
-          <Route path="/home" element={<Home />} />
+
+          {/* Ruta privada: sólo accesible si está autenticado */}
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>

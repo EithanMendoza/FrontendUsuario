@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaUser, FaLock, FaEnvelope, FaArrowLeft } from 'react-icons/fa';
 import navbar from '../assets/navbar-logo.png';
 
-const AuthPage = () => {
+const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [nombre_usuario, setNombreUsuario] = useState('');
   const [email, setEmail] = useState('');
@@ -173,4 +173,4 @@ navigate('/home');
   );
 };
 
-export default AuthPage;
+export default Login;

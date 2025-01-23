@@ -16,39 +16,41 @@ export default function MainPage() {
 
   useEffect(() => {
     const fetchProfileAndServices = async () => {
-      const token = localStorage.getItem('session_token')
-
+      const token = localStorage.getItem('session_token'); // Usar la misma clave que al almacenar el token
+  
       if (!token) {
-        setError('No tienes una sesión activa.')
-        return
+        console.log('Token no encontrado en localStorage');
+        setError('No tienes una sesión activa.');
+        return;
       }
-
+  
       try {
-        const apiUrl = import.meta.env.VITE_API_URL; // Obtener la URL de la variable de entorno
-
+        const apiUrl = import.meta.env.VITE_API_URL;
+  
         // Verificar si el perfil está creado
         const perfilResponse = await axios.get(`${apiUrl}/perfil/existe-perfil`, {
-          headers: { Authorization: token }
-        })
-
+          headers: { Authorization: token },
+        });
+  
         if (!perfilResponse.data.exists) {
-          setPerfilAdvertencia(true) // Mostrar advertencia si no existe el perfil
+          console.log('Perfil no encontrado, mostrando advertencia');
+          setPerfilAdvertencia(true);
         }
-
+  
         // Obtener los servicios
         const serviciosResponse = await axios.get(`${apiUrl}/home/servicios`, {
-          headers: { Authorization: token }
-        })
-
-        setServices(serviciosResponse.data)
+          headers: { Authorization: token },
+        });
+  
+        setServices(serviciosResponse.data);
       } catch (err) {
-        setError('Error al obtener los datos.')
-        console.error('Error:', err)
+        console.error('Error al obtener los datos:', err);
+        setError('Error al obtener los datos.');
       }
-    }
-
-    fetchProfileAndServices()
-  }, [])
+    };
+  
+    fetchProfileAndServices();
+  }, []);
 
   const seleccionarServicio = (idServicio) => {
     if (idServicio === 3 || idServicio === 4) {

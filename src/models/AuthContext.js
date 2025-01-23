@@ -7,7 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('sessionToken'));
 
   const login = (sessionToken) => {
-    localStorage.setItem('sessionToken', sessionToken);
+    localStorage.setItem('session_token', data.session_token); // Consistente con el MainPage.jsx
+
     setToken(sessionToken);
   };
 
